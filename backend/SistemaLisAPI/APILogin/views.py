@@ -22,12 +22,28 @@ class LoginView(View):
 
     def post(self, request):
         data = json.loads(request.body)
-        Login.objects.create(
-            username=data["username"],
-            password=data["password"]
-        )
-        return JsonResponse({"message": "User created"})
+        username = data.get("username")
+        password = data.get("password")
 
+        try:
+            user = Login.objects.get(username=username)
+            if user.password == password:
+                return JsonResponse({
+                    "success": True,
+                    "usuario": username,
+                    "mensaje": "Inicio de sesión exitoso"
+                })
+            else:
+                return JsonResponse({
+                    "success": False,
+                    "error": "Contraseña incorrecta"
+                }, status=401)
+        except Login.DoesNotExist:
+            return JsonResponse({
+                "success": False,
+                "error": "Usuario no encontrado"
+            }, status=404)
+            
     def put(self, request, id):
         data = json.loads(request.body)
         user = Login.objects.filter(id=id)
@@ -47,4 +63,3 @@ class LoginView(View):
             return JsonResponse({"message": "Deleted successfully"})
         else:
             return JsonResponse({"message": "User not found"})
-
