@@ -2,40 +2,50 @@
   <div class="container mt-5" style="max-width: 400px;">
     <div class="card shadow">
       <div class="card-header text-center bg-primary text-white">
-        <h4>Login</h4>
+        <h3>Iniciar sesión</h3>
       </div>
       <div class="card-body">
-        <form @submit.prevent="login">
-          <div class="mb-3">
-            <label class="form-label">Usuario</label>
-            <input v-model="usuario" type="text" class="form-control" required />
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Contraseña</label>
-            <input v-model="password" type="password" class="form-control" required />
-          </div>
-          <button class="btn btn-primary w-100" type="submit">Ingresar</button>
-        </form>
-
-        <!-- Botón para ir al registro -->
-        <div class="text-center mt-3">
-          <p>¿No tienes cuenta?</p>
-          <button class="btn btn-outline-secondary w-100" @click="irARegistro">
-            Registrar nuevo usuario
-          </button>
+        <div class="form-group mb-3">
+          <label for="usuario">Usuario</label>
+          <input
+            v-model="usuario"
+            type="text"
+            class="form-control"
+            id="usuario"
+            placeholder="Ingresa tu usuario"
+            required
+          />
+        </div>
+        <div class="form-group mb-3">
+          <label for="password">Contraseña</label>
+          <input
+            v-model="password"
+            type="password"
+            class="form-control"
+            id="password"
+            placeholder="Ingresa tu contraseña"
+            required
+          />
         </div>
 
-        <!-- Mensajes -->
-        <div v-if="mensaje" class="alert mt-3" :class="{'alert-success': exito, 'alert-danger': !exito}">
+        <button @click="login" class="btn btn-success w-100">Entrar</button>
+
+        <div v-if="mensaje" class="alert mt-3" :class="exito ? 'alert-success' : 'alert-danger'">
           {{ mensaje }}
         </div>
+      </div>
+      <div class="card-footer text-muted text-center">
+        @IngdeSw
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
+  name: "LoginView",
   data() {
     return {
       usuario: "",
@@ -45,44 +55,46 @@ export default {
     };
   },
   methods: {
-    login() {
-      fetch("http://localhost/practica1_sgt/apis/login.php?insertar=1", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          usuario: this.usuario,
+    async login() {
+      try {//puerto del backend cambiado a 8081
+        const response = await axios.post("http://127.0.0.1:8081/api/login/users/", {
+          username: this.usuario,
           password: this.password,
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            this.mensaje = "Bienvenido " + data.usuario;
-            this.exito = true;
-
-            // ✅ Guardar sesión en localStorage
-            localStorage.setItem("usuario", JSON.stringify(data));
-
-            // ✅ Actualizar reactividad global en App.vue (sin recargar)
-            this.$root.loggedIn = true;
-            this.$root.usuario = data.usuario;
-
-            // ✅ Redirigir a página principal
-            this.$router.push({ name: "home" }); 
-          } else {
-            this.mensaje = data.error;
-            this.exito = false;
-          }
-        })
-        .catch(() => {
-          this.mensaje = "Error de conexión al servidor";
-          this.exito = false;
         });
-    },
-    irARegistro() {
-      this.$router.push({ name: "RegistrarU" });
+
+        console.log("Respuesta del servidor:", response.data);
+
+        if (response.data.success) {
+          this.mensaje = `Bienvenido, ${response.data.usuario}`;
+          this.exito = true;
+
+          // Guardar sesión en localStorage
+          localStorage.setItem("usuario", JSON.stringify(response.data.usuario));
+
+          // Redirigir a la vista de pacientes
+          this.$router.push({ name: "home" });
+        } else {
+          this.mensaje = response.data.error || "Credenciales incorrectas";
+          this.exito = false;
+        }
+      } catch (error) {
+        console.error("Error en login:", error);
+        this.mensaje = "Error de conexión con el servidor";
+        this.exito = false;
+      }
     },
   },
 };
 </script>
 
+<style scoped>
+.container {
+  margin-top: 50px;
+}
+.card {
+  border-radius: 12px;
+}
+.btn {
+  border-radius: 8px;
+}
+</style>

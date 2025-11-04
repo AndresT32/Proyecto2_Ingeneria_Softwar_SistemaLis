@@ -1,87 +1,122 @@
 <template>
-  <div class="container">
-    <div class="card">
-      <div class="card-header">Listar Responsables</div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table table-primary">
-            <thead>
-              <tr>
-                <th>Codigo</th>
-                <th>ID</th>
-                <th>Cédula</th>
-                <th>Nombre completo</th>
-                <th>Cargo</th>
-                <th>Teléfono</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="resp in pacientes" :key="resp.Codigo_Resp">
-                <td>{{ resp.Codigo_Resp }}</td>
-                <td>{{ resp.ID_Resp }}</td>
-                <td>{{ resp.Cedula }}</td>
-                <td>{{ resp.Nombre }} {{ resp.Apellido }}</td>
-                <td>{{ resp.Cargo }}</td>
-                <td>{{ resp.Telefono }}</td>
-                <td>
-                  <div class="btn-group"> 
-                    <router-link
-                      :to="{ name: 'EditarResponsableView', params: { Codigo_Resp: resp.Codigo_Resp } }"
-                      class="btn btn-warning"
-                    >
-                      Editar
-                    </router-link>
-                    <button
-                      type="button"
-                      @click="borrarPaciente(resp.Codigo_Resp)"
-                      class="btn btn-danger"
-                    >
-                      Borrar
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+  <div class="container mt-4">
+    <div class="card shadow">
+      <div class="card-header bg-primary text-white text-center">
+        <h4>Lista de Pacientes</h4>
       </div>
-      <div class="card-footer">@Ingenieriadesw</div>
+
+      <div class="card-body">
+        <div class="d-flex justify-content-end mb-3">
+          <router-link
+            :to="{ name: 'CrearPacienteView' }"
+            class="btn btn-success"
+          >
+            ➕ Nuevo Paciente
+          </router-link>
+        </div>
+
+        <table class="table table-striped table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>Código Ingreso</th>
+              <th>Documento</th>
+              <th>Nombre</th>
+              <th>Apellido</th>
+              <th>Dirección</th>
+              <th>Teléfono</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="pac in pacientes" :key="pac.cod_ingreso">
+              <td>{{ pac.cod_ingreso }}</td>
+              <td>{{ pac.documento }}</td>
+              <td>{{ pac.nombre }}</td>
+              <td>{{ pac.apellido }}</td>
+              <td>{{ pac.direccion }}</td>
+              <td>{{ pac.telefono }}</td>
+              <td>
+                <div class="btn-group">
+                  <router-link
+                    :to="{
+                      name: 'EditarPacienteView',
+                      params: { cod_ingreso: pac.cod_ingreso },
+                    }"
+                    class="btn btn-warning btn-sm"
+                  >
+                    Editar
+                  </router-link>
+                  <button
+                    @click="borrarPaciente(pac.cod_ingreso)"
+                    class="btn btn-danger btn-sm"
+                  >
+                    Borrar
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card-footer text-center text-muted">@IngdeSw</div>
     </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
+  name: "PacienteView",
   data() {
     return {
-      pacientes: []
-    }
+      pacientes: [],
+    };
   },
   created() {
-    this.consultarPacientes()
+    this.obtenerPacientes();
   },
   methods: {
-    consultarPacientes() {
-      fetch('http://localhost/practica1_sgt/apis/responsable.php')
-        .then(res => res.json())
-        .then(data => {
-          if (Array.isArray(data) && data.length > 0 && !data[0].success) {
-            this.pacientes = data
-          }
-        })
-        .catch(console.error)
+    async obtenerPacientes() {
+      try {
+        const response = await axios.get(
+          "http://127.0.0.1:8081/api/pacientes/pacientes/"
+        );
+        this.pacientes = response.data.pacientes || [];
+      } catch (error) {
+        console.error("Error al obtener pacientes:", error);
+        alert("Error al cargar la lista de pacientes");
+      }
     },
-    borrarPaciente(codigo) {
-      fetch('http://localhost/practica1_sgt/apis/responsable.php?borrar=' + codigo)
-        .then(res => res.json())
-        .then(resp => {
-          if (resp.success) {
-            this.consultarPacientes() // recargar tabla en lugar de window.location.href
+    async borrarPaciente(cod_ingreso) {
+      if (confirm("¿Seguro que deseas eliminar este paciente?")) {
+        try {
+          const response = await axios.delete(
+            `http://127.0.0.1:8081/api/pacientes/pacientes/${cod_ingreso}/`
+          );
+          if (response.data.Message === "Paciente eliminado") {
+            alert("Paciente eliminado correctamente");
+            this.obtenerPacientes();
+          } else {
+            alert(response.data.Message);
           }
-        })
-        .catch(console.error)
-    }
-  }
-}
+        } catch (error) {
+          console.error("Error al borrar paciente:", error);
+          alert("Error al eliminar paciente");
+        }
+      }
+    },
+  },
+};
 </script>
+
+<style scoped>
+.card {
+  border-radius: 12px;
+}
+.table th,
+.table td {
+  vertical-align: middle;
+}
+</style>

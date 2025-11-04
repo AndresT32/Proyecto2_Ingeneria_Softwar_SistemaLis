@@ -3,9 +3,9 @@
     <!-- Encabezado de bienvenida -->
     <div class="welcome-card">
       <img src="../assets/Health.jpg" alt="Logo Inventario" class="logo" />
-      <h1>Bienvenido al Sistema de Inventario</h1>
+      <h1>Bienvenido al Sistema LIS</h1>
       <p>
-        Desde este panel puedes gestionar el registro, ubicación y responsables de los equipos médicos.
+        Desde este panel puedes gestionar el registro de Pacientes y Especialistas, además de los registros de exámenes médicos.
       </p>
     </div>
 
@@ -18,8 +18,8 @@
     :class="{ active: selectedModule === 'Equipo' }"
   >
     <i class="fas fa-stethoscope"></i>
-    <h3>Equipos Médicos</h3>
-    <p>Consulta, agrega o modifica los equipos registrados.</p>
+    <h3>Pacientes</h3>
+    <p>Ingreso de Pacientes</p>
   </div>
 
   <!-- Responsables -->
@@ -29,8 +29,8 @@
     :class="{ active: selectedModule === 'Responsable' }"
   >
     <i class="fas fa-user-md"></i>
-    <h3>Responsables</h3>
-    <p>Administra la información del personal encargado de los equipos.</p>
+    <h3>Especialista de laboratorio</h3>
+    <p>Ingreso de Especialistas</p>
   </div>
 
   <!-- Ubicaciones -->
@@ -40,8 +40,8 @@
     :class="{ active: selectedModule === 'Ubicacion' }"
   >
     <i class="fas fa-map-marker-alt"></i>
-    <h3>Ubicaciones</h3>
-    <p>Gestiona las áreas y lugares donde se encuentran los equipos médicos.</p>
+    <h3>Registros</h3>
+    <p>Ingreso de Resultados de laboratorio</p>
   </div>
 
     </div>
@@ -129,4 +129,3 @@ export default {
   font-size: 14px;
 }
 </style>
-

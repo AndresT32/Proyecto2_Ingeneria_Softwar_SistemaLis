@@ -16,24 +16,23 @@ const routes = [
     path: "/",
     name: "home",
     component: HomeView
-  },
-  {
-    path: "/EditarResponsableView/:Codigo_Resp",
-    name: "EditarResponsableView",
-    component: EditarResponsableView,
-    props: true,
+  },  {
+    path: '/ResponsableView',
+    name: 'PacienteView', // renombrar aquí sin tocar el archivo
+    component: ResponsableView,
     meta: { requiresAuth: true }
   },
   {
-    path: "/CrearResponsableView",
-    name: "CrearResponsableView",
+    path: '/CrearResponsableView',
+    name: 'CrearPacienteView', // ronombra
     component: CrearResponsableView,
     meta: { requiresAuth: true }
   },
   {
-    path: "/ResponsableView",
-    name: "ResponsableView",
-    component: ResponsableView,
+    path: '/EditarResponsableView/:cod_ingreso',
+    name: 'EditarPacienteView', // 👈 nombre interno
+    component: EditarResponsableView,
+    props: true,
     meta: { requiresAuth: true }
   },
   {

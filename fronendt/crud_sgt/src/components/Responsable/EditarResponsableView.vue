@@ -1,136 +1,128 @@
 <template>
-  <div class="container">
-    <div class="card">
-      <div class="card-header">Editar responsable</div>
+  <div class="container mt-4">
+    <div class="card shadow">
+      <div class="card-header bg-warning text-dark text-center">
+        <h4>Editar Paciente</h4>
+      </div>
+
       <div class="card-body">
-        <form @submit.prevent="actualizarRegistro">
-          <!-- Mostrar Codigo_Resp y ID_Resp como lectura, no editables -->
-          <div class="row mb-1">
-            <label>Codigo (no editable)</label>
-            <input type="text" class="form-control" :value="codigoResp" disabled>
-          </div>
-          <div class="row mb-1">
-            <label>ID (no editable)</label>
-            <input type="text" class="form-control" :value="paciente.ID_Resp" disabled>
-          </div>
-
-          <!-- Campos editables -->
-          <div class="row mb-1">
-            <label for="Cedula">Cédula</label>
-            <input id="Cedula" v-model="paciente.Cedula" class="form-control" required>
+        <form @submit.prevent="actualizarPaciente">
+          <div class="mb-3">
+            <label>Código Ingreso (no editable)</label>
+            <input
+              type="text"
+              class="form-control"
+              :value="codIngreso"
+              disabled
+            />
           </div>
 
-          <div class="row mb-1">
-            <label for="Nombre">Nombre</label>
-            <input id="Nombre" v-model="paciente.Nombre" class="form-control" required>
+          <div class="mb-3">
+            <label>Documento</label>
+            <input v-model="paciente.documento" class="form-control" required />
           </div>
 
-          <div class="row mb-1">
-            <label for="Apellido">Apellido</label>
-            <input id="Apellido" v-model="paciente.Apellido" class="form-control" required>
+          <div class="mb-3">
+            <label>Nombre</label>
+            <input v-model="paciente.nombre" class="form-control" required />
           </div>
 
-          <div class="row mb-1">
-            <label for="Cargo">Cargo</label>
-            <input id="Cargo" v-model="paciente.Cargo" class="form-control">
-            <small class="form-text text-muted">Si cambia el cargo, el Código primario puede modificarse automáticamente.</small>
+          <div class="mb-3">
+            <label>Apellido</label>
+            <input v-model="paciente.apellido" class="form-control" required />
           </div>
 
-          <div class="row mb-1">
-            <label for="Telefono">Teléfono</label>
-            <input id="Telefono" v-model="paciente.Telefono" class="form-control">
+          <div class="mb-3">
+            <label>Dirección</label>
+            <input v-model="paciente.direccion" class="form-control" />
           </div>
 
-          <div class="btn-group" role="group">
+          <div class="mb-3">
+            <label>Teléfono</label>
+            <input v-model="paciente.telefono" class="form-control" />
+          </div>
+
+          <div class="btn-group w-100" role="group">
             <button type="submit" class="btn btn-success">Guardar</button>
-            <router-link :to="{ name: 'ResponsableView' }" class="btn btn-warning">Cancelar</router-link>
+            <router-link :to="{ name: 'PacienteView' }" class="btn btn-secondary">
+              Cancelar
+            </router-link>
           </div>
         </form>
       </div>
+
+      <div class="card-footer text-center text-muted">@IngdeSw</div>
     </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
-  props: ['Codigo_Resp'], // si usas props: true en la ruta
+  name: "EditarPacienteView",
+  props: ["cod_ingreso"], // parámetro que viene desde el router
   data() {
     return {
       paciente: {
-        ID_Resp: '',
-        Cedula: '',
-        Nombre: '',
-        Apellido: '',
-        Cargo: '',
-        Telefono: ''
-      }
-    }
+        documento: "",
+        nombre: "",
+        apellido: "",
+        direccion: "",
+        telefono: "",
+      },
+    };
   },
   computed: {
-    codigoResp() {
-      // Si la ruta usa param o prop, usa el prop; fallback a $route
-      return this.Codigo_Resp || this.$route.params.Codigo_Resp || '';
-    }
+    codIngreso() {
+      return this.cod_ingreso || this.$route.params.cod_ingreso || "";
+    },
   },
   created() {
-    this.obtenerPacienteID();
+    this.obtenerPaciente();
   },
   methods: {
-    obtenerPacienteID() {
-      const codigo = encodeURIComponent(this.codigoResp);
-      fetch(`http://localhost/practica1_sgt/apis/responsable.php?consultar=${codigo}`)
-        .then(res => res.json())
-        .then(data => {
-          if (!data || data.success === 0) {
-            alert('Responsable no encontrado');
-            this.$router.push({ name: 'ResponsableView' });
-            return;
-          }
-          // aquí la API devuelve un objeto asociativo (no array)
-          // asignamos directamente
-          this.paciente = data;
-        })
-        .catch(err => {
-          console.error(err);
-          alert('Error al obtener datos del responsable');
-        });
+    async obtenerPaciente() {
+      try {
+        const response = await axios.get(
+          `http://127.0.0.1:8081/api/pacientes/pacientes/${this.codIngreso}/`
+        );
+        if (response.data.Message === "Success") {
+          this.paciente = response.data.paciente;
+        } else {
+          alert(response.data.Message);
+          this.$router.push({ name: "PacienteView" });
+        }
+      } catch (error) {
+        console.error("Error al obtener paciente:", error);
+        alert("Error al obtener paciente");
+        this.$router.push({ name: "PacienteView" });
+      }
     },
 
-    actualizarRegistro() {
-      const codigoOld = this.codigoResp;
-      const datosEnviar = {
-        // No es necesario enviar Codigo_Resp en body: la API usa ?actualizar=codigoOld
-        Cedula: this.paciente.Cedula,
-        Nombre: this.paciente.Nombre,
-        Apellido: this.paciente.Apellido,
-        Cargo: this.paciente.Cargo,
-        Telefono: this.paciente.Telefono
-      };
-
-      fetch(`http://localhost/practica1_sgt/apis/responsable.php?actualizar=${encodeURIComponent(codigoOld)}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datosEnviar)
-      })
-        .then(res => res.json())
-        .then(resp => {
-          if (resp.success) {
-            // la API puede devolver "Codigo_Resp" nuevo si cambió el cargo
-            if (resp.Codigo_Resp && resp.Codigo_Resp !== codigoOld) {
-              alert(`Actualizado. Nuevo Codigo_Resp: ${resp.Codigo_Resp}`);
-            } else {
-              alert('Actualización exitosa');
-            }
-            this.$router.push({ name: 'ResponsableView' });
-          } else {
-            alert('Error al actualizar: ' + (resp.error || 'desconocido'));
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          alert('Error en la petición de actualización');
-        });
-    }
-  }
-}
+    async actualizarPaciente() {
+      try {
+        const response = await axios.put(
+          `http://127.0.0.1:8081/api/pacientes/pacientes/${this.codIngreso}/`,
+          this.paciente
+        );
+        if (response.data.Message === "Paciente actualizado") {
+          alert("Paciente actualizado correctamente");
+          this.$router.push({ name: "PacienteView" });
+        } else {
+          alert(response.data.Message);
+        }
+      } catch (error) {
+        console.error("Error al actualizar paciente:", error);
+        alert("Error al actualizar paciente");
+      }
+    },
+  },
+};
 </script>
+
+<style scoped>
+.card {
+  border-radius: 12px;
+}
+</style>

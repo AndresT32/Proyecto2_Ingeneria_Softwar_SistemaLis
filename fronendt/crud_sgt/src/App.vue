@@ -173,6 +173,12 @@ export default {
       this.loggedIn = false;
       this.usuario = "";
     },
+    // ✅ Agregamos aquí el método que estaba duplicado
+    onUserLoggedIn() {
+      const userData = JSON.parse(localStorage.getItem("usuario"));
+      this.usuario = userData.usuario || "";
+      this.loggedIn = true;
+    },
   },
   created() {
     const userData = localStorage.getItem("usuario");
@@ -181,10 +187,16 @@ export default {
       this.usuario = parsed.usuario || "";
       this.loggedIn = true;
     }
-    // 🔒 Si no está logueado y no está en login/registro, mandarlo al login
+
+    // 🔔 Escucha evento global de login
+    window.addEventListener("userLoggedIn", this.onUserLoggedIn);
+
     if (!this.loggedIn && !this.isAuthPage) {
       this.$router.push("/LoginU");
     }
+  },
+  beforeUnmount() {
+    window.removeEventListener("userLoggedIn", this.onUserLoggedIn);
   },
 };
 </script>

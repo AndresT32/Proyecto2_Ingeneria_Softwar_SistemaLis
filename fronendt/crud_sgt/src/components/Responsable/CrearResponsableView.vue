@@ -1,108 +1,92 @@
 <template>
-  <div class="container">
+  <div class="container mt-4">
     <div class="card">
-      <div class="card-header">Formulario para crear responsable nuevo</div>
+      <div class="card-header bg-primary text-white">
+        Registrar Paciente
+      </div>
+
       <div class="card-body">
-        <form v-on:submit.prevent="agregarRegistro">
-          
-          <div class="row mb-1">
-            <label for="Cedula">Cédula</label>
-            <input 
-              type="text" 
-              required 
-              class="form-control" 
-              id="Cedula" 
-              name="Cedula" 
-              v-model="paciente.Cedula">
+        <form @submit.prevent="crearPaciente">
+          <div class="mb-3">
+            <label>Documento</label>
+            <input v-model="paciente.documento" class="form-control" required />
           </div>
 
-          <div class="row mb-1">
-            <label for="Nombre">Nombre</label>
-            <input 
-              type="text" 
-              required 
-              class="form-control" 
-              id="Nombre" 
-              name="Nombre" 
-              v-model="paciente.Nombre">
+          <div class="mb-3">
+            <label>Nombre</label>
+            <input v-model="paciente.nombre" class="form-control" required />
           </div>
 
-          <div class="row mb-1">
-            <label for="Apellido">Apellido</label>
-            <input 
-              type="text" 
-              required 
-              class="form-control" 
-              id="Apellido" 
-              name="Apellido" 
-              v-model="paciente.Apellido">
+          <div class="mb-3">
+            <label>Apellido</label>
+            <input v-model="paciente.apellido" class="form-control" required />
           </div>
 
-          <div class="row mb-1">
-            <label for="Cargo">Cargo</label>
-            <input 
-              type="text" 
-              class="form-control" 
-              id="Cargo" 
-              name="Cargo" 
-              v-model="paciente.Cargo">
+          <div class="mb-3">
+            <label>Dirección</label>
+            <input v-model="paciente.direccion" class="form-control" />
           </div>
 
-          <div class="row mb-1">
-            <label for="Telefono">Teléfono</label>
-            <input 
-              type="text" 
-              class="form-control" 
-              id="Telefono" 
-              name="Telefono" 
-              v-model="paciente.Telefono">
+          <div class="mb-3">
+            <label>Teléfono</label>
+            <input v-model="paciente.telefono" class="form-control" />
           </div>
 
-          <div class="btn-group" role="group">
+          <div class="btn-group w-100" role="group">
             <button type="submit" class="btn btn-success">Guardar</button>
-            <router-link :to="{name:'ResponsableView'}" class="btn btn-warning">Cancelar</router-link>
+            <router-link :to="{ name: 'PacienteView' }" class="btn btn-warning">
+              Cancelar
+            </router-link>
           </div>
         </form>
       </div>
-    </div> 
+
+      <div class="card-footer text-muted text-center">@IngdeSw</div>
+    </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
+  name: "CrearPacienteView", // puedes dejarlo como CrearResponsableView temporalmente
   data() {
     return {
       paciente: {
-        Cedula: "",
-        Nombre: "",
-        Apellido: "",
-        Cargo: "",
-        Telefono: ""
-      }
-    }
+        documento: "",
+        nombre: "",
+        apellido: "",
+        direccion: "",
+        telefono: "",
+      },
+    };
   },
   methods: {
-    agregarRegistro() {
-      let datosEnviar = {
-        Cedula: this.paciente.Cedula,
-        Nombre: this.paciente.Nombre,
-        Apellido: this.paciente.Apellido,
-        Cargo: this.paciente.Cargo,
-        Telefono: this.paciente.Telefono
-      };
+    async crearPaciente() {
+      try {
+        const response = await axios.post(
+          "http://127.0.0.1:8081/api/pacientes/pacientes/",
+          this.paciente
+        );
 
-      fetch("http://localhost/practica1_sgt/apis/responsable.php?insertar=1", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(datosEnviar)
-      })
-      .then(respuesta => respuesta.json())
-      .then(datoRespuesta => {
-        console.log(datoRespuesta);
-        this.$router.push({ name: "ResponsableView" })
-      })
-      .catch(error => console.log(error));
-    }
-  }
-}
+        if (response.data.Message === "Paciente creado exitosamente") {
+          alert("✅ Paciente registrado correctamente");
+          this.$router.push({ name: "PacienteView" });
+        } else {
+          alert(response.data.Message || "Error al crear paciente");
+        }
+      } catch (error) {
+        console.error("Error al crear paciente:", error);
+        alert("Error de conexión con el servidor");
+      }
+    },
+  },
+};
 </script>
+
+<style scoped>
+.card {
+  border-radius: 12px;
+}
+</style>
