@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'APIResultados',
     'APIPaciente',
     'APILaboratoristas',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -53,10 +54,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 CORS_ALLOWED_ORIGINS = [
-    "https://example.com",
-    "https://sub.example.com",
-    "http://localhost:8080",
+    "http://localhost:8081",
     "http://127.0.0.1:9000",
+    "http://localhost:8081",
+    "http://192.168.1.12:8081"
 ]
 
 ROOT_URLCONF = 'SistemaLisAPI.urls'
