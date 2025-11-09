@@ -99,7 +99,11 @@ const router = createRouter({
 // 🔒 Guard de autenticación
 router.beforeEach((to, from, next) => {
   const isLoggedIn = !!localStorage.getItem("usuario");
-
+    // 🟢 Si entra directamente a "/" sin estar logueado → redirigir a Login
+  if (to.path === "/" && !isLoggedIn) {
+    next("/LoginU");
+    return;
+  }
   // Si intenta entrar a login o registro y ya está logueado → redirigir a Home
   if ((to.path === "/LoginU" || to.path === "/RegistrarU") && isLoggedIn) {
     next("/");
@@ -112,6 +116,7 @@ router.beforeEach((to, from, next) => {
 
   if (authRequired && !isLoggedIn) {
     next("/LoginU");
+    
     return;
   }
 

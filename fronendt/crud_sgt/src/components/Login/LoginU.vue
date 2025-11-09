@@ -70,6 +70,7 @@ export default {
 
           // Guardar sesión en localStorage
           localStorage.setItem("usuario", JSON.stringify(response.data.usuario));
+                window.dispatchEvent(new Event("userLoggedIn"));
 
           // Redirigir a la vista de pacientes
           this.$router.push({ name: "home" });
@@ -79,9 +80,26 @@ export default {
         }
       } catch (error) {
         console.error("Error en login:", error);
-        this.mensaje = "Error de conexión con el servidor";
-        this.exito = false;
-      }
+
+          if (error.response) {
+            // El servidor respondió, pero con un código fuera del rango 2xx
+            if (error.response.status === 401) {
+              this.mensaje = error.response.data.error || "Contraseña incorrecta";
+            } else if (error.response.status === 404) {
+              this.mensaje = "Usuario no encontrado";
+            } else {
+              this.mensaje = "Error del servidor: " + (error.response.data.error || "Intenta más tarde");
+            }
+          } else if (error.request) {
+            // No hubo respuesta del servidor
+            this.mensaje = "No se pudo contactar con el servidor";
+          } else {
+            // Algo más falló al configurar la solicitud
+            this.mensaje = "Error al preparar la solicitud";
+          }
+
+          this.exito = false;
+        }
     },
   },
 };

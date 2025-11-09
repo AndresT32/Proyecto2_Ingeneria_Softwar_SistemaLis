@@ -11,22 +11,22 @@
 
     <!-- Tarjetas de acceso rápido -->
     <div class="modules">
-  <!-- Equipos Médicos -->
+  <!-- Pacientes Médicos -->
   <div
     class="module-card"
-    @click="selectModuleAndNavigate('Equipo', '/EquiposMedicosView')"
-    :class="{ active: selectedModule === 'Equipo' }"
+    @click="selectModuleAndNavigate('Paciente', '/PacienteView')"
+    :class="{ active: selectedModule === 'Paciente' }"
   >
     <i class="fas fa-stethoscope"></i>
     <h3>Pacientes</h3>
     <p>Ingreso de Pacientes</p>
   </div>
 
-  <!-- Pacientes -->
-  <div
+  <!-- Laboratorio -->
+ <div
     class="module-card"
-    @click="selectModuleAndNavigate('Paciente', '/PacienteView')"
-    :class="{ active: selectedModule === 'Paciente' }"
+    @click="selectModuleAndNavigate('Laboratorista', '/ListLaboratoristas')"
+    :class="{ active: selectedModule === 'Laboratorista' }"
   >
     <i class="fas fa-user-md"></i>
     <h3>Especialista de laboratorio</h3>
@@ -36,8 +36,8 @@
   <!-- Ubicaciones -->
   <div
     class="module-card"
-    @click="selectModuleAndNavigate('Laboratorista', '/ListLaboratoristas')"
-    :class="{ active: selectedModule === 'Laboratorista' }"
+    @click="selectModuleAndNavigate('Resultados', '/ResultadosMedicosView')"
+    :class="{ active: selectedModule === 'Resultados' }"
   >
     <i class="fas fa-map-marker-alt"></i>
     <h3>Registros</h3>
