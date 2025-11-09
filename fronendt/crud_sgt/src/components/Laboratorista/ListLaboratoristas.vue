@@ -6,11 +6,7 @@
       </div>
 
       <div class="card-body">
-        <div class="d-flex justify-content-end mb-3">
-          <router-link :to="{ name: 'CrearLaboratorista' }" class="btn btn-success">
-            ➕ Nuevo Laboratorista
-          </router-link>
-        </div>
+
 
         <table class="table table-striped table-hover">
           <thead class="table-dark">

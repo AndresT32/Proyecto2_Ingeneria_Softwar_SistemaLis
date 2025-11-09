@@ -69,7 +69,7 @@ export default {
           this.exito = true;
 
           // Guardar sesión en localStorage
-          localStorage.setItem("usuario", JSON.stringify(response.data.usuario));
+          localStorage.setItem("usuario", JSON.stringify({ usuario: response.data.usuario }));
           window.dispatchEvent(new Event("userLoggedIn"));
           // Redirigir a la vista de pacientes
           this.$router.push({ name: "home" });

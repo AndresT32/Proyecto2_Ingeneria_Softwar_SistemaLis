@@ -6,14 +6,7 @@
       </div>
 
       <div class="card-body">
-        <div class="d-flex justify-content-end mb-3">
-          <router-link
-            :to="{ name: 'CrearPacienteView' }"
-            class="btn btn-success"
-          >
-            ➕ Nuevo Paciente
-          </router-link>
-        </div>
+
 
         <table class="table table-striped table-hover">
           <thead class="table-dark">

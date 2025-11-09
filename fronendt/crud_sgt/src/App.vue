@@ -24,7 +24,7 @@
         <aside v-if="!isHomePage" class="sidebar">
           <div class="sidebar-header">
             <img src="../src/assets/Health.jpg" alt="Logo Inventario" class="logo" />
-            <h2 class="sidebar-title">Inventario</h2>
+            <h2 class="sidebar-title">Sistema LIS</h2>
           </div>
 
           <ul class="menu">
@@ -180,6 +180,24 @@ export default {
       this.loggedIn = true;
     },
   },
+  watch: {
+    $route(to) {
+      if (to.path.includes("Paciente")) {
+        this.selectedModule = "Paciente";
+        this.showModulo = true;
+      } else if (to.path.includes("Laboratorista")) {
+        this.selectedModule = "Laboratorista";
+        this.showModulo = true;
+      } else if (to.path.includes("Resultados")) {
+        this.selectedModule = "Resultados";
+        this.showModulo = true;
+      } else {
+        this.showModulo = false;
+        this.selectedModule = null;
+      }
+    },
+  },
+
   created() {
     const userData = localStorage.getItem("usuario");
     if (userData) {
