@@ -46,15 +46,15 @@
                     @click="selectModuleAndNavigate('Responsable', '/ResponsableView')"
                     :class="{ active: selectedModule === 'Responsable' }"
                   >
-                    <i class="fas fa-user-md"></i> Responsables
+                    <i class="fas fa-user-md"></i> Pacientes
                   </button>
                 </li>
                 <li>
                   <button
-                    @click="selectModuleAndNavigate('Ubicacion', '/UbicacionView')"
-                    :class="{ active: selectedModule === 'Ubicacion' }"
+                    @click="selectModuleAndNavigate('Laboratorista', '/ListLaboratoristas')"
+                    :class="{ active: selectedModule === 'Laboratorista' }"
                   >
-                    <i class="fas fa-map-marker-alt"></i> Ubicaciones
+                    <i class="fas fa-map-marker-alt"></i> Laboratoristas
                   </button>
                 </li>
                 <li>
@@ -134,8 +134,8 @@ export default {
         case "Responsable":
           this.$router.push("/CrearResponsableView");
           break;
-        case "Ubicacion":
-          this.$router.push("/CrearUbicacionView");
+        case "Laboratorista":
+          this.$router.push("/CrearLaboratorista");
           break;
         case "Equipo":
           this.$router.push("/CrearEquiposMedicosView");
@@ -153,8 +153,8 @@ export default {
         case "Responsable":
           this.$router.push(`/EditarResponsableView/${id}`);
           break;
-        case "Ubicacion":
-          this.$router.push(`/EditarUbicacionView/${id}`);
+        case "Laboratorista":
+          this.$router.push(`/EditarLaboratorista/${id}`);
           break;
         case "Equipo":
           this.$router.push(`/EditarEquiposMedicosView/${id}`);

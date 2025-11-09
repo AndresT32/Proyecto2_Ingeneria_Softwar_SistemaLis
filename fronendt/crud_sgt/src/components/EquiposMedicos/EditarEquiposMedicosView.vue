@@ -1,152 +1,94 @@
 <template>
-  <div class="container">
-    <div class="card">
-      <div class="card-header">Editar Equipo Médico</div>
+  <div class="container mt-4">
+    <div class="card shadow">
+      <div class="card-header bg-warning text-dark text-center">
+        <h4>Editar Resultado</h4>
+      </div>
+
       <div class="card-body">
-        <form @submit.prevent="actualizarRegistro">
-          <!-- Código e ID (solo lectura) -->
-          <div class="row mb-1">
-            <label>Código (no editable)</label>
-            <input type="text" class="form-control" :value="codigoEM" disabled>
-          </div>
-          <div class="row mb-1">
-            <label>ID (no editable)</label>
-            <input type="text" class="form-control" :value="equipo.ID_EM" disabled>
-          </div>   
-
-          <!-- Marca -->
-          <div class="row mb-1">
-            <label for="Marca">Marca</label>
-            <input id="Marca" v-model="equipo.Marca" class="form-control">
+        <form @submit.prevent="actualizarResultado">
+          <div class="mb-3">
+            <label>ID Resultado</label>
+            <input :value="idResultado" class="form-control" disabled />
           </div>
 
-          <!-- Modelo -->
-          <div class="row mb-1">
-            <label for="Modelo">Modelo</label>
-            <input id="Modelo" v-model="equipo.Modelo" class="form-control">
-          </div>
-
-          <!-- Lista desplegable de ubicaciones -->
-          <div class="row mb-1">
-            <label for="Codigo_ubi">Código de Ubicación</label>
-            <select class="form-control" id="Codigo_ubi" v-model="equipo.Codigo_ubi">
-              <option value="">Seleccione una ubicación</option>
-              <option v-for="ubi in ubicaciones" :key="ubi.Codigo_ubi" :value="ubi.Codigo_ubi">
-                {{ ubi.Codigo_ubi }} - {{ ubi.Nombre_ubi }}
+          <div class="mb-3">
+            <label>Paciente</label>
+            <select v-model="resultado.cod_ingreso" class="form-control">
+              <option v-for="p in pacientes" :key="p.cod_ingreso" :value="p.cod_ingreso">
+                {{ p.cod_ingreso }} - {{ p.nombre }} {{ p.apellido }}
               </option>
             </select>
           </div>
 
-          <!-- Lista desplegable de responsables -->
-          <div class="row mb-1">
-            <label for="Codigo_Resp">Código Responsable</label>
-            <select class="form-control" id="Codigo_Resp" v-model="equipo.Codigo_Resp">
-              <option value="">Seleccione un responsable</option>
-              <option v-for="resp in responsables" :key="resp.Codigo_Resp" :value="resp.Codigo_Resp">
-                {{ resp.Codigo_Resp }} - {{ resp.Nombre }} {{ resp.Apellido }}
+          <div class="mb-3">
+            <label>Laboratorista</label>
+            <select v-model="resultado.cod_laboratorista" class="form-control">
+              <option v-for="l in laboratoristas" :key="l.cod_laboratorista" :value="l.cod_laboratorista">
+                {{ l.cod_laboratorista }} - {{ l.nombre }} {{ l.apellido }}
               </option>
             </select>
           </div>
 
-          <!-- Botones -->
-          <div class="btn-group" role="group">
+          <div class="mb-3"><label>HDL</label><input v-model="resultado.hdl" class="form-control" /></div>
+          <div class="mb-3"><label>LDL</label><input v-model="resultado.ldl" class="form-control" /></div>
+          <div class="mb-3"><label>Triglicéridos</label><input v-model="resultado.trigliceridos" class="form-control" /></div>
+
+          <div class="btn-group w-100">
             <button type="submit" class="btn btn-success">Guardar</button>
-            <router-link :to="{ name: 'EquiposMedicosView' }" class="btn btn-warning">Cancelar</router-link>
+            <router-link :to="{ name: 'EquiposMedicosView' }" class="btn btn-secondary">Cancelar</router-link>
           </div>
         </form>
       </div>
+      <div class="card-footer text-center text-muted">@IngdeSw</div>
     </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
 export default {
-  props: ['ID_EM'],
+  props: ["ID_EM"],
   data() {
     return {
-      equipo: {
-        ID_EM: '',
-        Codigo_ubi: '',
-        Codigo_Resp: '',
-        Marca: '',
-        Modelo: '',
-        Estado: ''
-      },
-      ubicaciones: [],
-      responsables: []
-    }
+      resultado: {},
+      pacientes: [],
+      laboratoristas: [],
+    };
   },
   computed: {
-    codigoEM() {
-      return this.ID_EM || this.$route.params.ID_EM || '';
-    }
+    idResultado() {
+      return this.ID_EM || this.$route.params.ID_EM;
+    },
   },
-  created() {
-    this.obtenerEquipoID();
-    this.cargarListas();
+  async created() {
+    await this.cargarListas();
+    await this.obtenerResultado();
   },
   methods: {
-    obtenerEquipoID() {
-      const codigo = encodeURIComponent(this.codigoEM);
-      fetch(`http://localhost/practica1_sgt/apis/equiposMedicos.php?consultar=${codigo}`)
-        .then(res => res.json())
-        .then(data => {
-          if (!data || data.success === 0) {
-            alert('Equipo no encontrado');
-            this.$router.push({ name: 'EquiposMedicosView' });
-            return;
-          }
-          this.equipo = data;
-        })
-        .catch(err => {
-          console.error(err);
-          alert('Error al obtener datos del equipo médico');
-        });
+    async cargarListas() {
+      const [pacs, labs] = await Promise.all([
+        axios.get("http://127.0.0.1:8081/api/pacientes/pacientes/"),
+        axios.get("http://127.0.0.1:8081/api/laboratoristas/laboratoristas/"),
+      ]);
+      this.pacientes = pacs.data.pacientes || [];
+      this.laboratoristas = labs.data.laboratoristas || [];
     },
-
-    cargarListas() {
-      // cargar ubicaciones
-      fetch("http://localhost/practica1_sgt/apis/ubicacion.php")
-        .then(r => r.json())
-        .then(data => this.ubicaciones = data)
-        .catch(err => console.log(err));
-
-      // cargar responsables
-      fetch("http://localhost/practica1_sgt/apis/responsable.php")
-        .then(r => r.json())
-        .then(data => this.responsables = data)
-        .catch(err => console.log(err));
+    async obtenerResultado() {
+      const res = await axios.get(`http://127.0.0.1:8081/api/resultados/resultados/${this.idResultado}/`);
+      if (res.data.message === "Success") this.resultado = res.data.resultado;
+      else alert(res.data.message);
     },
-
-    actualizarRegistro() {
-      const codigoOld = this.codigoEM;
-      const datosEnviar = {
-        Codigo_ubi: this.equipo.Codigo_ubi,
-        Codigo_Resp: this.equipo.Codigo_Resp,
-        Marca: this.equipo.Marca,
-        Modelo: this.equipo.Modelo,
-        Estado: this.equipo.Estado
-      };
-
-      fetch(`http://localhost/practica1_sgt/apis/equiposMedicos.php?actualizar=${encodeURIComponent(codigoOld)}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datosEnviar)
-      })
-        .then(res => res.json())
-        .then(resp => {
-          if (resp.success) {
-            alert('Actualización exitosa');
-            this.$router.push({ name: 'EquiposMedicosView' });
-          } else {
-            alert('Error al actualizar: ' + (resp.error || 'desconocido'));
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          alert('Error en la petición de actualización');
-        });
-    }
-  }
-}
+    async actualizarResultado() {
+      const res = await axios.put(
+        `http://127.0.0.1:8081/api/resultados/resultados/${this.idResultado}/`,
+        this.resultado
+      );
+      if (res.data.message === "Updated") {
+        alert("Resultado actualizado correctamente");
+        this.$router.push({ name: "EquiposMedicosView" });
+      } else alert(res.data.message);
+    },
+  },
+};
 </script>

@@ -36,8 +36,8 @@
   <!-- Ubicaciones -->
   <div
     class="module-card"
-    @click="selectModuleAndNavigate('Ubicacion', '/UbicacionView')"
-    :class="{ active: selectedModule === 'Ubicacion' }"
+    @click="selectModuleAndNavigate('Laboratorista', '/ListLaboratoristas')"
+    :class="{ active: selectedModule === 'Laboratorista' }"
   >
     <i class="fas fa-map-marker-alt"></i>
     <h3>Registros</h3>

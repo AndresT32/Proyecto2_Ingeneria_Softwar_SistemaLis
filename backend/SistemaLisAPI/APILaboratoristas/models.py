@@ -9,3 +9,6 @@ class Laboratoristas(models.Model):
 
     class Meta:
         db_table = 'Laboratoristas'
+
+    def __str__(self):
+        return f"{self.nombre} {self.apellido}"

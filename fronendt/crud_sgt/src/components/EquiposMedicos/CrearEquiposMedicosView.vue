@@ -1,130 +1,110 @@
 <template>
-  <div class="container">
-    <div class="card">
-      <div class="card-header">Formulario para crear equipo médico nuevo</div>
+  <div class="container mt-4">
+    <div class="card shadow">
+      <div class="card-header bg-primary text-white text-center">
+        <h4>Registrar Resultado</h4>
+      </div>
+
       <div class="card-body">
-        <form v-on:submit.prevent="agregarEquipo">
+        <form @submit.prevent="crearResultado">
 
-          <div class="row mb-1">
-            <label for="Num_activo">Número de Activo</label>
-            <input 
-              type="text" 
-              required 
-              class="form-control" 
-              id="Num_activo" 
-              v-model="equipo.Num_activo">
-          </div>
-
-          <div class="row mb-1">
-            <label for="Marca">Marca</label>
-            <input 
-              type="text" 
-              required 
-              class="form-control" 
-              id="Marca" 
-              v-model="equipo.Marca">
-          </div>
-
-          <div class="row mb-1">
-            <label for="Modelo">Modelo</label>
-            <input 
-              type="text" 
-              required 
-              class="form-control" 
-              id="Modelo" 
-              v-model="equipo.Modelo">
-          </div>
-
-          <!-- Lista desplegable de ubicaciones -->
-          <div class="row mb-1">
-            <label for="Codigo_ubi">Código de Ubicación</label>
-            <select 
-              class="form-control" 
-              id="Codigo_ubi" 
-              v-model="equipo.Codigo_ubi">
-              <option value="">Seleccione una ubicación</option>
-              <option v-for="ubi in ubicaciones" :key="ubi.Codigo_ubi" :value="ubi.Codigo_ubi">
-                {{ ubi.Codigo_ubi }} - {{ ubi.Nombre_ubi }}
+          <div class="mb-3">
+            <label>Paciente</label>
+            <select v-model="resultado.cod_ingreso" class="form-control" required>
+              <option value="">Seleccione un paciente</option>
+              <option v-for="p in pacientes" :key="p.cod_ingreso" :value="p.cod_ingreso">
+                {{ p.cod_ingreso }} - {{ p.nombre }} {{ p.apellido }}
               </option>
             </select>
           </div>
 
-          <!-- Lista desplegable de responsables -->
-          <div class="row mb-1">
-            <label for="Codigo_Resp">Código de Responsable</label>
-            <select 
-              class="form-control" 
-              id="Codigo_Resp" 
-              v-model="equipo.Codigo_Resp">
-              <option value="">Seleccione un responsable</option>
-              <option v-for="resp in responsables" :key="resp.Codigo_Resp" :value="resp.Codigo_Resp">
-                {{ resp.Codigo_Resp }} - {{ resp.Nombre }} {{ resp.Apellido }}
+          <div class="mb-3">
+            <label>Laboratorista</label>
+            <select v-model="resultado.cod_laboratorista" class="form-control" required>
+              <option value="">Seleccione un laboratorista</option>
+              <option v-for="l in laboratoristas" :key="l.cod_laboratorista" :value="l.cod_laboratorista">
+                {{ l.cod_laboratorista }} - {{ l.nombre }} {{ l.apellido }}
               </option>
             </select>
           </div>
 
-          <div class="btn-group" role="group">
+          <div class="mb-3">
+            <label>HDL</label>
+            <input v-model="resultado.hdl" class="form-control" required />
+          </div>
+
+          <div class="mb-3">
+            <label>LDL</label>
+            <input v-model="resultado.ldl" class="form-control" required />
+          </div>
+
+          <div class="mb-3">
+            <label>Triglicéridos</label>
+            <input v-model="resultado.trigliceridos" class="form-control" required />
+          </div>
+
+          <div class="btn-group w-100">
             <button type="submit" class="btn btn-success">Guardar</button>
-            <router-link :to="{name:'EquiposMedicosView'}" class="btn btn-warning">Cancelar</router-link>
+            <router-link :to="{ name: 'EquiposMedicosView' }" class="btn btn-warning">Cancelar</router-link>
           </div>
         </form>
       </div>
-    </div> 
+      <div class="card-footer text-center text-muted">@IngdeSw</div>
+    </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   data() {
     return {
-      equipo: {
-        Num_activo: "",
-        Marca: "",
-        Modelo: "",
-        Codigo_ubi: "",
-        Codigo_Resp: ""
+      resultado: {
+        cod_ingreso: "",
+        cod_laboratorista: "",
+        hdl: "",
+        ldl: "",
+        trigliceridos: "",
       },
-      ubicaciones: [],
-      responsables: []
-    }
+      pacientes: [],
+      laboratoristas: [],
+    };
+  },
+  created() {
+    this.cargarListas();
   },
   methods: {
-    agregarEquipo() {
-      let datosEnviar = { ...this.equipo };
-
-      fetch("http://localhost/practica1_sgt/apis/equiposmedicos.php?insertar=1", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(datosEnviar)
-      })
-      .then(respuesta => respuesta.json())
-      .then(datoRespuesta => {
-        console.log(datoRespuesta);
-        if (datoRespuesta.success == 1) {
-          this.$router.push({ name: "EquiposMedicosView" })
-        } else {
-          alert("Error al guardar el equipo: " + (datoRespuesta.error || "verifica los datos."));
-        }
-      })
-      .catch(error => console.log(error));
+    async cargarListas() {
+      try {
+        const [pacs, labs] = await Promise.all([
+          axios.get("http://127.0.0.1:8081/api/pacientes/pacientes/"),
+          axios.get("http://127.0.0.1:8081/api/laboratoristas/laboratoristas/"),
+        ]);
+        this.pacientes = pacs.data.pacientes || [];
+        this.laboratoristas = labs.data.laboratoristas || [];
+      } catch (error) {
+        console.error(error);
+        alert("Error al cargar listas");
+      }
     },
-
-    cargarListas() {
-      // cargar ubicaciones
-      fetch("http://localhost/practica1_sgt/apis/ubicacion.php")
-        .then(r => r.json())
-        .then(data => this.ubicaciones = data)
-        .catch(err => console.log(err));
-
-      // cargar responsables
-      fetch("http://localhost/practica1_sgt/apis/responsable.php")
-        .then(r => r.json())
-        .then(data => this.responsables = data)
-        .catch(err => console.log(err));
-    }
+    async crearResultado() {
+      try {
+        const res = await axios.post(
+          "http://127.0.0.1:8081/api/resultados/resultados/",
+          this.resultado
+        );
+        if (res.data.message.includes("exitosamente")) {
+          alert("✅ Resultado registrado correctamente");
+          this.$router.push({ name: "EquiposMedicosView" });
+        } else {
+          alert(res.data.message);
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Error al crear resultado");
+      }
+    },
   },
-  mounted() {
-    this.cargarListas();
-  }
-}
+};
 </script>

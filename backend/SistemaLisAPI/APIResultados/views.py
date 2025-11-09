@@ -12,15 +12,36 @@ class ResultadosView(View):
 
     def get(self, request, id_resultado=None):
         if id_resultado:
-            resultados = list(Resultado.objects.filter(id_resultado=id_resultado).values())
-            if len(resultados) > 0:
-                datos = {"message": "Success", "resultado": resultados[0]}
+            resultados = list(Resultado.objects.filter(id_resultado=id_resultado)
+                              .select_related('cod_ingreso', 'cod_laboratorista')
+                              .values(
+                                  'id_resultado',
+                                  'hdl', 'ldl', 'trigliceridos',
+                                  'cod_ingreso__cod_ingreso',
+                                  'cod_ingreso__nombre',
+                                  'cod_ingreso__apellido',
+                                  'cod_laboratorista__cod_laboratorista',
+                                  'cod_laboratorista__nombre',
+                                  'cod_laboratorista__apellido'
+                              ))
+            if resultados:
+                return JsonResponse({"message": "Success", "resultado": resultados[0]})
             else:
-                datos = {"message": "Resultado not found"}
+                return JsonResponse({"message": "Resultado not found"})
         else:
-            resultados = list(Resultado.objects.values())
-            datos = {"message": "Success", "resultados": resultados}
-        return JsonResponse(datos)
+            resultados = list(Resultado.objects
+                              .select_related('cod_ingreso', 'cod_laboratorista')
+                              .values(
+                                  'id_resultado',
+                                  'hdl', 'ldl', 'trigliceridos',
+                                  'cod_ingreso__cod_ingreso',      # ✅ se agregó
+                                  'cod_ingreso__nombre',
+                                  'cod_ingreso__apellido',
+                                  'cod_laboratorista__cod_laboratorista',
+                                  'cod_laboratorista__nombre',
+                                  'cod_laboratorista__apellido'
+                              ))
+            return JsonResponse({"message": "Success", "resultados": resultados})
 
     def post(self, request):
         data = json.loads(request.body)
@@ -31,8 +52,7 @@ class ResultadosView(View):
         if not Laboratoristas.objects.filter(cod_laboratorista=data["cod_laboratorista"]).exists():
             return JsonResponse({"message": "El laboratorista no existe"}, status=400)
 
-        # Crear el resultado
-        resultado = Resultado.objects.create(
+        Resultado.objects.create(
             cod_ingreso_id=data["cod_ingreso"],
             hdl=data["hdl"],
             ldl=data["ldl"],
@@ -40,10 +60,7 @@ class ResultadosView(View):
             cod_laboratorista_id=data["cod_laboratorista"]
         )
 
-        return JsonResponse({
-            "message": "Resultado creado exitosamente"
-        })
-
+        return JsonResponse({"message": "Resultado creado exitosamente"})
 
     def put(self, request, id_resultado):
         data = json.loads(request.body)
@@ -51,10 +68,10 @@ class ResultadosView(View):
         if resultado.exists():
             r = resultado.first()
             r.cod_ingreso_id = data["cod_ingreso"]
+            r.cod_laboratorista_id = data["cod_laboratorista"]
             r.hdl = data["hdl"]
             r.ldl = data["ldl"]
             r.trigliceridos = data["trigliceridos"]
-            r.cod_laboratorista_id = data["cod_laboratorista"]
             r.save()
             return JsonResponse({"message": "Updated"})
         else:

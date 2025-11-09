@@ -11,6 +11,9 @@ import EditarEquiposMedicosView from '../components/EquiposMedicos/EditarEquipos
 import EquiposMedicosView from '../components/EquiposMedicos/EquiposMedicosView.vue'      
 import LoginU from '@/components/Login/LoginU.vue'
 import RegistrarU from '@/components/Login/RegistrarU.vue'
+import CrearLaboratorista from '@/components/Laboratorista/CrearLaboratorista.vue'
+import EditarLaboratorista from '@/components/Laboratorista/EditarLaboratorista.vue'
+import ListLaboratoristas from '@/components/Laboratorista/ListLaboratoristas.vue'
 const routes = [
   {
     path: "/",
@@ -87,7 +90,27 @@ const routes = [
   {
     path: "/:catchAll(.*)",
     redirect: { name: "LoginU" }
-  }
+  },
+  {
+  path: '/ListLaboratoristas',
+  name: 'ListLaboratoristas',
+  component: ListLaboratoristas,
+  meta: { requiresAuth: true }
+},
+{
+  path: '/CrearLaboratorista',
+  name: 'CrearLaboratorista',
+  component: CrearLaboratorista,
+  meta: { requiresAuth: true }
+},
+{
+  path: '/EditarLaboratorista/:cod_laboratorista',
+  name: 'EditarLaboratorista',
+  component: EditarLaboratorista,
+  props: true,
+  meta: { requiresAuth: true }
+},
+
 ];
 
 const router = createRouter({
