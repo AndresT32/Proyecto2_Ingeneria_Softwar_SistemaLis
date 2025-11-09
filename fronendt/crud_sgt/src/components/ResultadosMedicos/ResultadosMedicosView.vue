@@ -7,7 +7,7 @@
 
       <div class="card-body">
         <div class="d-flex justify-content-end mb-3">
-          <router-link :to="{ name: 'CrearEquiposMedicosView' }" class="btn btn-success">
+          <router-link :to="{ name: 'CrearResultadosMedicosView' }" class="btn btn-success">
             ➕ Nuevo Resultado
           </router-link>
         </div>
@@ -37,7 +37,7 @@
               <td>
                 <div class="btn-group">
                   <router-link
-                    :to="{ name: 'EditarEquiposMedicosView', params: { ID_EM: r.id_resultado } }"
+                    :to="{ name: 'EditarResultadosMedicosView', params: { ID_EM: r.id_resultado } }"
                     class="btn btn-warning btn-sm"
                   >Editar</router-link>
                   <button @click="borrarResultado(r.id_resultado)" class="btn btn-danger btn-sm">

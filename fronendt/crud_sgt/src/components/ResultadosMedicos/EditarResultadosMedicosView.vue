@@ -36,7 +36,7 @@
 
           <div class="btn-group w-100">
             <button type="submit" class="btn btn-success">Guardar</button>
-            <router-link :to="{ name: 'EquiposMedicosView' }" class="btn btn-secondary">Cancelar</router-link>
+            <router-link :to="{ name: 'ResultadosMedicosView' }" class="btn btn-secondary">Cancelar</router-link>
           </div>
         </form>
       </div>
@@ -86,7 +86,7 @@ export default {
       );
       if (res.data.message === "Updated") {
         alert("Resultado actualizado correctamente");
-        this.$router.push({ name: "EquiposMedicosView" });
+        this.$router.push({ name: "ResultadosMedicosView" });
       } else alert(res.data.message);
     },
   },

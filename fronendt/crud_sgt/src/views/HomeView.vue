@@ -22,11 +22,11 @@
     <p>Ingreso de Pacientes</p>
   </div>
 
-  <!-- Responsables -->
+  <!-- Pacientes -->
   <div
     class="module-card"
-    @click="selectModuleAndNavigate('Responsable', '/ResponsableView')"
-    :class="{ active: selectedModule === 'Responsable' }"
+    @click="selectModuleAndNavigate('Paciente', '/PacienteView')"
+    :class="{ active: selectedModule === 'Paciente' }"
   >
     <i class="fas fa-user-md"></i>
     <h3>Especialista de laboratorio</h3>

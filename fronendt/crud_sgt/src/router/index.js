@@ -1,14 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
-import EditarResponsableView from '../components/Responsable/EditarResponsableView.vue'
-import ResponsableView from '../components/Responsable/ResponsableView.vue'
-import CrearResponsableView from '../components/Responsable/CrearResponsableView.vue'
-import CrearUbicacionView from '../components/Ubicacion/CrearUbicacionView.vue'
-import EditarUbicacionView from '../components/Ubicacion/EditarUbicacionView.vue'
-import UbicacionView from '../components/Ubicacion/UbicacionView.vue'
-import CrearEquiposMedicosView from '../components/EquiposMedicos/CrearEquiposMedicosView.vue'
-import EditarEquiposMedicosView from '../components/EquiposMedicos/EditarEquiposMedicosView.vue'
-import EquiposMedicosView from '../components/EquiposMedicos/EquiposMedicosView.vue'      
+import EditarPacienteView from '../components/Paciente/EditarPacienteView.vue'
+import PacienteView from '../components/Paciente/PacienteView.vue'
+import CrearPacienteView from '../components/Paciente/CrearPacienteView.vue'
+import CrearResultadosMedicosView from '../components/ResultadosMedicos/CrearResultadosMedicosView.vue'
+import EditarResultadosMedicosView from '../components/ResultadosMedicos/EditarResultadosMedicosView.vue'
+import ResultadosMedicosView from '../components/ResultadosMedicos/ResultadosMedicosView.vue'      
 import LoginU from '@/components/Login/LoginU.vue'
 import RegistrarU from '@/components/Login/RegistrarU.vue'
 import CrearLaboratorista from '@/components/Laboratorista/CrearLaboratorista.vue'
@@ -20,60 +17,41 @@ const routes = [
     name: "home",
     component: HomeView
   },  {
-    path: '/ResponsableView',
-    name: 'PacienteView', // renombrar aquí sin tocar el archivo
-    component: ResponsableView,
+    path: '/PacienteView',
+    name: 'PacienteView',
+    component: PacienteView,
     meta: { requiresAuth: true }
   },
   {
-    path: '/CrearResponsableView',
-    name: 'CrearPacienteView', // ronombra
-    component: CrearResponsableView,
+    path: '/CrearPacienteView',
+    name: 'CrearPacienteView', 
+    component: CrearPacienteView,
     meta: { requiresAuth: true }
   },
   {
-    path: '/EditarResponsableView/:cod_ingreso',
-    name: 'EditarPacienteView', // 👈 nombre interno
-    component: EditarResponsableView,
+    path: '/EditarPacienteView/:cod_ingreso',
+    name: 'EditarPacienteView', 
+    component: EditarPacienteView,
     props: true,
     meta: { requiresAuth: true }
   },
   {
-    path: "/CrearUbicacionView",
-    name: "CrearUbicacionView",
-    component: CrearUbicacionView,
+    path: "/CrearResultadosMedicosView",
+    name: "CrearResultadosMedicosView",
+    component: CrearResultadosMedicosView,
     meta: { requiresAuth: true }
   },
   {
-    path: "/EditarUbicacionView/:Codigo_ubi",
-    name: "EditarUbicacionView",
-    component: EditarUbicacionView,
+    path: "/EditarResultadosMedicosView/:ID_EM",
+    name: "EditarResultadosMedicosView",
+    component: EditarResultadosMedicosView,
     props: true,
     meta: { requiresAuth: true }
   },
   {
-    path: "/UbicacionView",
-    name: "UbicacionView",
-    component: UbicacionView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: "/CrearEquiposMedicosView",
-    name: "CrearEquiposMedicosView",
-    component: CrearEquiposMedicosView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: "/EditarEquiposMedicosView/:ID_EM",
-    name: "EditarEquiposMedicosView",
-    component: EditarEquiposMedicosView,
-    props: true,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: "/EquiposMedicosView",
-    name: "EquiposMedicosView",
-    component: EquiposMedicosView,
+    path: "/ResultadosMedicosView",
+    name: "ResultadosMedicosView",
+    component: ResultadosMedicosView,
     meta: { requiresAuth: true }
   },
   {

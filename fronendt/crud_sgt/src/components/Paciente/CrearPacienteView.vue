@@ -50,7 +50,7 @@
 import axios from "axios";
 
 export default {
-  name: "CrearPacienteView", // puedes dejarlo como CrearResponsableView temporalmente
+  name: "CrearPacienteView", // puedes dejarlo como CrearPacienteView temporalmente
   data() {
     return {
       paciente: {
