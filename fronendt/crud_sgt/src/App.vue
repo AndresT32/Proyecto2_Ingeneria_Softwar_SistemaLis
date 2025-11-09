@@ -43,8 +43,8 @@
               <ul v-if="showModulo" class="submenu">
                 <li>
                   <button
-                    @click="selectModuleAndNavigate('Paciente', '/PacienteView')"
-                    :class="{ active: selectedModule === 'Paciente' }"
+                    @click="selectModuleAndNavigate('Responsable', '/ResponsableView')"
+                    :class="{ active: selectedModule === 'Responsable' }"
                   >
                     <i class="fas fa-user-md"></i> Pacientes
                   </button>
@@ -59,10 +59,10 @@
                 </li>
                 <li>
                   <button
-                    @click="selectModuleAndNavigate('Equipo', '/ResultadosMedicosView')"
+                    @click="selectModuleAndNavigate('Equipo', '/EquiposMedicosView')"
                     :class="{ active: selectedModule === 'Equipo' }"
                   >
-                    <i class="fas fa-stethoscope"></i> Resultados Médicos
+                    <i class="fas fa-stethoscope"></i> Equipos Médicos
                   </button>
                 </li>
               </ul>
@@ -131,14 +131,14 @@ export default {
         return;
       }
       switch (modulo) {
-        case "Paciente":
-          this.$router.push("/CrearPacienteView");
+        case "Responsable":
+          this.$router.push("/CrearResponsableView");
           break;
         case "Laboratorista":
           this.$router.push("/CrearLaboratorista");
           break;
         case "Equipo":
-          this.$router.push("/CrearResultadosMedicosView");
+          this.$router.push("/CrearEquiposMedicosView");
           break;
       }
     },
@@ -150,14 +150,14 @@ export default {
       const id = prompt(`Ingresa el ID del ${modulo} a editar:`);
       if (!id) return;
       switch (modulo) {
-        case "Paciente":
-          this.$router.push(`/EditarPacienteView/${id}`);
+        case "Responsable":
+          this.$router.push(`/EditarResponsableView/${id}`);
           break;
         case "Laboratorista":
           this.$router.push(`/EditarLaboratorista/${id}`);
           break;
         case "Equipo":
-          this.$router.push(`/EditarResultadosMedicosView/${id}`);
+          this.$router.push(`/EditarEquiposMedicosView/${id}`);
           break;
       }
     },
