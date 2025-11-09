@@ -70,12 +70,7 @@ export default {
 
           // Guardar sesión en localStorage
           localStorage.setItem("usuario", JSON.stringify(response.data.usuario));
-<<<<<<< HEAD
-                window.dispatchEvent(new Event("userLoggedIn"));
-
-=======
           window.dispatchEvent(new Event("userLoggedIn"));
->>>>>>> d725872948f5bb9999fbf1cd01bebbc5a5728c37
           // Redirigir a la vista de pacientes
           this.$router.push({ name: "home" });
         } else {
@@ -83,11 +78,7 @@ export default {
           this.exito = false;
         }
       } catch (error) {
-<<<<<<< HEAD
-        console.error("Error en login:", error);
-=======
           console.error("Error en login:", error);
->>>>>>> d725872948f5bb9999fbf1cd01bebbc5a5728c37
 
           if (error.response) {
             // El servidor respondió, pero con un código fuera del rango 2xx
@@ -108,10 +99,7 @@ export default {
 
           this.exito = false;
         }
-<<<<<<< HEAD
-=======
 
->>>>>>> d725872948f5bb9999fbf1cd01bebbc5a5728c37
     },
   },
 };
