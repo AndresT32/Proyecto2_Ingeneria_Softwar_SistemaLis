@@ -1,16 +1,18 @@
 <template>
   <div id="app">
-    <!-- Si estoy en login o registro, muestro esas vistas y oculto todo el resto -->
+
+    <!-- Login / Registro -->
     <div v-if="isAuthPage">
       <router-view />
     </div>
 
-    <!-- Si estoy logueado (home o cualquier otra vista del sistema), muestro topbar + layout -->
-    <div v-else-if="isLoggedIn">
-      <!-- ✅ Header SIEMPRE visible -->
-      <header class="topbar">
+    <!-- Sistema -->
+    <div v-else>
+
+      <!-- Header -->
+      <header v-if="isLoggedIn" class="topbar">
         <div class="topbar-left">
-          <img src="../src/assets/usuario.jpg" alt="Logo Inventario" class="logo" />
+          <img src="../src/assets/usuario.jpg" alt="Logo usuario" class="logo" />
           <h1 class="topbar-title">Hola, {{ usuario || "Invitado" }}</h1>
         </div>
         <div class="topbar-right">
@@ -18,18 +20,19 @@
         </div>
       </header>
 
-      <!-- ✅ Layout general -->
-      <div class="layout">
-        <!-- Sidebar solo si NO estoy en Home -->
+      <!-- Layout principal -->
+      <div v-if="isLoggedIn" class="layout">
+
+        <!-- Sidebar except en Home -->
         <aside v-if="!isHomePage" class="sidebar">
           <div class="sidebar-header">
-            <img src="../src/assets/Health.jpg" alt="Logo Inventario" class="logo" />
+            <img src="../src/assets/Health.jpg" alt="Logo" class="logo" />
             <h2 class="sidebar-title">Sistema LIS</h2>
           </div>
 
           <ul class="menu">
             <li>
-              <router-link to="/" class="menu-link">
+              <router-link to="/Home" class="menu-link">
                 <i class="fas fa-home"></i> Home
               </router-link>
             </li>
@@ -42,26 +45,22 @@
 
               <ul v-if="showModulo" class="submenu">
                 <li>
-                  <button
-                    @click="selectModuleAndNavigate('Paciente', '/PacienteView')"
-                    :class="{ active: selectedModule === 'Paciente' }"
-                  >
+                  <button @click="selectModuleAndNavigate('Paciente', '/PacienteView')"
+                          :class="{ active: selectedModule === 'Paciente' }">
                     <i class="fas fa-user-md"></i> Pacientes
                   </button>
                 </li>
+
                 <li>
-                  <button
-                    @click="selectModuleAndNavigate('Laboratorista', '/ListLaboratoristas')"
-                    :class="{ active: selectedModule === 'Laboratorista' }"
-                  >
+                  <button @click="selectModuleAndNavigate('Laboratorista', '/ListLaboratoristas')"
+                          :class="{ active: selectedModule === 'Laboratorista' }">
                     <i class="fas fa-map-marker-alt"></i> Laboratoristas
                   </button>
                 </li>
+
                 <li>
-                  <button
-                    @click="selectModuleAndNavigate('Resultados', '/ResultadosMedicosView')"
-                    :class="{ active: selectedModule === 'Resultados' }"
-                  >
+                  <button @click="selectModuleAndNavigate('Resultados', '/ResultadosMedicosView')"
+                          :class="{ active: selectedModule === 'Resultados' }">
                     <i class="fas fa-stethoscope"></i> Resultados Médicos
                   </button>
                 </li>
@@ -77,7 +76,6 @@
               </button>
             </li>
 
-            
           </ul>
         </aside>
 
@@ -86,12 +84,9 @@
           <router-view />
         </main>
       </div>
+
     </div>
 
-    <!-- Si no está logueado y no es login/registro → redirigir -->
-    <div v-else>
-      <router-view />
-    </div>
   </div>
 </template>
 
@@ -101,10 +96,11 @@ export default {
     return {
       selectedModule: null,
       showModulo: false,
-      loggedIn: !!localStorage.getItem("usuario"),
+      loggedIn: false,
       usuario: "",
     };
   },
+
   computed: {
     isAuthPage() {
       return this.$route.path === "/LoginU" || this.$route.path === "/RegistrarU";
@@ -114,112 +110,92 @@ export default {
     },
     isHomePage() {
       return this.$route.name === "home" || this.$route.path === "/";
-    },
+    }
   },
+
   methods: {
     selectModuleAndNavigate(modulo, route) {
-      if (!this.isLoggedIn) {
-        this.$router.push("/LoginU");
-        return;
-      }
+      if (!this.loggedIn) return this.$router.push("/LoginU");
       this.selectedModule = modulo;
       this.$router.push(route);
     },
+
     irCrear(modulo) {
-      if (!this.isLoggedIn) {
-        this.$router.push("/LoginU");
-        return;
-      }
-      switch (modulo) {
-        case "Paciente":
-          this.$router.push("/CrearPacienteView");
-          break;
-        case "Laboratorista":
-          this.$router.push("/CrearLaboratorista");
-          break;
-        case "Resultados":
-          this.$router.push("/CrearResultadosMedicosView");
-          break;
-      }
+      if (!this.loggedIn) return this.$router.push("/LoginU");
+      const routes = {
+        Paciente: "/CrearPacienteView",
+        Laboratorista: "/CrearLaboratorista",
+        Resultados: "/CrearResultadosMedicosView",
+      };
+      this.$router.push(routes[modulo]);
     },
+
     irEditar(modulo) {
-      if (!this.isLoggedIn) {
-        this.$router.push("/LoginU");
-        return;
-      }
+      if (!this.loggedIn) return this.$router.push("/LoginU");
       const id = prompt(`Ingresa el ID del ${modulo} a editar:`);
       if (!id) return;
-      switch (modulo) {
-        case "Paciente":
-          this.$router.push(`/EditarPacienteView/${id}`);
-          break;
-        case "Laboratorista":
-          this.$router.push(`/EditarLaboratorista/${id}`);
-          break;
-        case "Resultados":
-          this.$router.push(`/EditarResultadosMedicosView/${id}`);
-          break;
-      }
+
+      const routes = {
+        Paciente: `/EditarPacienteView/${id}`,
+        Laboratorista: `/EditarLaboratorista/${id}`,
+        Resultados: `/EditarResultadosMedicosView/${id}`,
+      };
+      this.$router.push(routes[modulo]);
     },
+
     logout() {
-      if (!this.isLoggedIn) {
-        alert("No hay sesión activa.");
-        return;
-      }
-      localStorage.removeItem("usuario");
-      this.$router.push("/LoginU");
+      sessionStorage.removeItem("usuario");
+      this.usuario = "";
+      this.loggedIn = false;
       this.selectedModule = null;
       this.showModulo = false;
-      this.loggedIn = false;
-      this.usuario = "";
+      this.$router.push("/LoginU");
     },
-    // ✅ Agregamos aquí el método que estaba duplicado
+
     onUserLoggedIn() {
-      const userData = JSON.parse(localStorage.getItem("usuario"));
-      this.usuario = userData.usuario || "";
-      this.loggedIn = true;
-    },
+      const raw = sessionStorage.getItem("usuario");
+      if (!raw) {
+        this.loggedIn = false;
+        this.usuario = "";
+        return;
+      }
+
+      let userData = null;
+      try { userData = JSON.parse(raw); } catch { userData = null; }
+
+      if (userData && userData.usuario) {
+        this.usuario = userData.usuario;
+        this.loggedIn = true;
+      } else {
+        this.loggedIn = false;
+      }
+    }
   },
+
   watch: {
     $route(to) {
       if (to.path.includes("Paciente")) {
-        this.selectedModule = "Paciente";
-        this.showModulo = true;
+        this.selectedModule = "Paciente"; this.showModulo = true;
       } else if (to.path.includes("Laboratorista")) {
-        this.selectedModule = "Laboratorista";
-        this.showModulo = true;
+        this.selectedModule = "Laboratorista"; this.showModulo = true;
       } else if (to.path.includes("Resultados")) {
-        this.selectedModule = "Resultados";
-        this.showModulo = true;
+        this.selectedModule = "Resultados"; this.showModulo = true;
       } else {
-        this.showModulo = false;
-        this.selectedModule = null;
+        this.selectedModule = null; this.showModulo = false;
       }
-    },
+    }
   },
 
   created() {
-    const userData = localStorage.getItem("usuario");
-    if (userData) {
-      const parsed = JSON.parse(userData);
-      this.usuario = parsed.usuario || "";
-      this.loggedIn = true;
-    }
-
-    // 🔔 Escucha evento global de login
+    this.onUserLoggedIn();
     window.addEventListener("userLoggedIn", this.onUserLoggedIn);
-
-    if (!this.loggedIn && !this.isAuthPage) {
-      this.$router.push("/LoginU");
-    }
   },
+
   beforeUnmount() {
     window.removeEventListener("userLoggedIn", this.onUserLoggedIn);
-  },
+  }
 };
 </script>
-
-
 
   <style>
   /* --- Estilos previos del layout --- */

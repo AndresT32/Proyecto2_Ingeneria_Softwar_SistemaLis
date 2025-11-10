@@ -13,17 +13,7 @@
           <div class="mb-3">
             <label class="form-label">Contraseña</label>
             <input v-model="password" type="password" class="form-control" required />
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Rol</label>
-            <select v-model="rol" class="form-control" required>
-              <option disabled value="">Seleccione un rol</option>
-              <option value="admin">Administrador</option>
-              <option value="medico">Médico</option>
-              <option value="enfermero">Enfermero</option>
-              <option value="usuario">Usuario</option>
-            </select>
-          </div>
+          </div>          
           <button class="btn btn-success w-100" type="submit">Registrar</button>
         </form>
 
@@ -52,40 +42,40 @@ export default {
   },
   methods: {
     registrar() {
-      fetch("http://localhost/practica1_sgt/apis/registrar.php?insertar=1", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          usuario: this.usuario,
-          password: this.password,
-          rol: this.rol,
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            this.mensaje = "Usuario registrado correctamente";
-            this.exito = true;
+  fetch("http://127.0.0.1:8081/api/login/users/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      accion: "registro",       
+      username: this.usuario,
+      password: this.password
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) {
+        this.mensaje = "Usuario registrado correctamente";
+        this.exito = true;
 
-            // limpiar formulario
-            this.usuario = "";
-            this.password = "";
-            this.rol = "";
+        this.usuario = "";
+        this.password = "";
 
-            // redirigir al login después de un pequeño delay
-            setTimeout(() => {
-              this.$router.push({ name: "LoginU" }); // asegúrate de que tu ruta de login se llame "Login"
-            }, 1500);
-          } else {
-            this.mensaje = data.error || "No se pudo registrar";
-            this.exito = false;
-          }
-        })
-        .catch(() => {
-          this.mensaje = "Error de conexión al servidor";
-          this.exito = false;
-        });
-    },
+        setTimeout(() => {
+          this.$router.push({ name: "LoginU" });
+        }, 1500);
+
+      } else {
+        this.mensaje = data.error || "No se pudo registrar";
+        this.exito = false;
+      }
+    })
+    .catch(() => {
+      this.mensaje = "Error de conexión al servidor";
+      this.exito = false;
+    });
+}
+
+
   },
 };
 </script>

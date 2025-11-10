@@ -54,7 +54,7 @@ export default {
 
   data() {
     return {
-      loggedIn: !!localStorage.getItem("usuario"),
+      loggedIn: !!sessionStorage.getItem("usuario"),
       selectedModule: null,
     };
   },

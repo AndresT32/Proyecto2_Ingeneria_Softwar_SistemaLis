@@ -14,22 +14,11 @@ import EditarLaboratorista from '@/components/Laboratorista/EditarLaboratorista.
 import ListLaboratoristas from '@/components/Laboratorista/ListLaboratoristas.vue'
 
 const routes = [
-  // Root: redirige CONDICIONALMENTE según localStorage
   {
     path: '/',
-    redirect: () => {
-      try {
-        const raw = localStorage.getItem('usuario')
-        const obj = raw ? JSON.parse(raw) : null
-        const loggedIn = !!(obj && Object.keys(obj).length > 0)
-        return loggedIn ? '/Home' : '/LoginU'
-      } catch (e) {
-        return '/LoginU'
-      }
-    }
+    redirect: '/Home'
   },
 
-  // Home ahora en /Home (no en '/')
   {
     path: '/Home',
     name: 'home',
@@ -37,7 +26,6 @@ const routes = [
     meta: { requiresAuth: true }
   },
 
-  // Resto de rutas protegidas
   {
     path: '/PacienteView',
     name: 'PacienteView',
@@ -57,6 +45,7 @@ const routes = [
     props: true,
     meta: { requiresAuth: true }
   },
+
   {
     path: '/CrearResultadosMedicosView',
     name: 'CrearResultadosMedicosView',
@@ -76,6 +65,7 @@ const routes = [
     component: ResultadosMedicosView,
     meta: { requiresAuth: true }
   },
+
   {
     path: '/ListLaboratoristas',
     name: 'ListLaboratoristas',
@@ -96,7 +86,6 @@ const routes = [
     meta: { requiresAuth: true }
   },
 
-  // Auth pages
   {
     path: '/LoginU',
     name: 'LoginU',
@@ -108,42 +97,45 @@ const routes = [
     component: RegistrarU
   },
 
-  // catch all
   {
     path: '/:catchAll(.*)',
-    redirect: { name: 'LoginU' }
+    redirect: '/LoginU'
   }
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(),
   routes
 })
 
-// Guard: protege rutas
+// ✅ Middleware de protección de rutas
 router.beforeEach((to, from, next) => {
-  // debug rápido (puedes comentar después)
   console.log('[ROUTER] to:', to.path)
 
-  let usuarioRaw = localStorage.getItem('usuario')
+  const raw = sessionStorage.getItem('usuario')
   let usuarioObj = null
-  try { usuarioObj = usuarioRaw ? JSON.parse(usuarioRaw) : null } catch { usuarioObj = null }
-  const isLoggedIn = !!(usuarioObj && Object.keys(usuarioObj).length > 0)
+
+  try {
+    usuarioObj = raw ? JSON.parse(raw) : null
+  } catch {
+    usuarioObj = null
+  }
+
+  const isLoggedIn = !!(usuarioObj && usuarioObj.usuario)
+
   console.log('[ROUTER] isLoggedIn:', isLoggedIn, 'usuarioObj:', usuarioObj)
 
-  // Si intenta entrar a login/registro y ya está logueado -> Home
+  // ✅ Evita que entren a Login o Registrar si ya están logueados
   if ((to.path === '/LoginU' || to.path === '/RegistrarU') && isLoggedIn) {
-    next('/Home')
-    return
+    return next('/Home')
   }
 
-  // Si la ruta requiere auth y no está logueado -> Login
-  if (to.meta && to.meta.requiresAuth && !isLoggedIn) {
-    next('/LoginU')
-    return
+  // ✅ Rutas protegidas
+  if (to.meta.requiresAuth && !isLoggedIn) {
+    return next('/LoginU')
   }
 
-  next()
+  return next()
 })
 
 export default router

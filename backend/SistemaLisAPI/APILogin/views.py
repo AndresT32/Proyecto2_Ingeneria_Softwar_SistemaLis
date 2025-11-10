@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.hashers import make_password, check_password
 from .models import Login
 import json
 
@@ -22,44 +23,55 @@ class LoginView(View):
 
     def post(self, request):
         data = json.loads(request.body)
+
+        accion = data.get("accion")
         username = data.get("username")
         password = data.get("password")
 
-        try:
-            user = Login.objects.get(username=username)
-            if user.password == password:
-                return JsonResponse({
-                    "success": True,
-                    "usuario": username,
-                    "mensaje": "Inicio de sesión exitoso"
-                })
-            else:
+        # ==========================
+        # ✅ 1. REGISTRO DE USUARIO
+        # ==========================
+        if accion == "registro":
+
+            if Login.objects.filter(username=username).exists():
+                return JsonResponse({"success": False, "error": "El usuario ya existe"}, status=400)
+
+            hashed_password = make_password(password)
+
+            Login.objects.create(
+                username=username,
+                password=hashed_password
+            )
+
+            return JsonResponse({
+                "success": True,
+                "message": "Usuario registrado correctamente"
+            })
+
+        # ==========================
+        # ✅ 2. LOGIN DE USUARIO
+        # ==========================
+        if accion == "login":
+
+            try:
+                user = Login.objects.get(username=username)
+
+                if check_password(password, user.password):
+                    return JsonResponse({
+                        "success": True,
+                        "usuario": username,
+                        "mensaje": "Inicio de sesión exitoso"
+                    })
+                else:
+                    return JsonResponse({
+                        "success": False,
+                        "error": "Contraseña incorrecta"
+                    }, status=401)
+
+            except Login.DoesNotExist:
                 return JsonResponse({
                     "success": False,
-                    "error": "Contraseña incorrecta"
-                }, status=401)
-        except Login.DoesNotExist:
-            return JsonResponse({
-                "success": False,
-                "error": "Usuario no encontrado"
-            }, status=404)
-            
-    def put(self, request, id):
-        data = json.loads(request.body)
-        user = Login.objects.filter(id=id)
-        if user.exists():
-            u = user.first()
-            u.username = data["username"]
-            u.password = data["password"]
-            u.save()
-            return JsonResponse({"message": "User updated"})
-        else:
-            return JsonResponse({"message": "User not found"})
+                    "error": "Usuario no encontrado"
+                }, status=404)
 
-    def delete(self, request, id):
-        user = Login.objects.filter(id=id)
-        if user.exists():
-            user.delete()
-            return JsonResponse({"message": "Deleted successfully"})
-        else:
-            return JsonResponse({"message": "User not found"})
+        return JsonResponse({"success": False, "error": "Acción no válida"}, status=400)
